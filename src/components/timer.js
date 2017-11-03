@@ -27,14 +27,6 @@ class Timer extends React.Component {
         this.setState({seconds: this.convertToSeconds(this.currentTime(), this.props.endTime) });
       }
     }, 1000);
-
-    // setInterval(() => {
-    //   this.setState({seconds: this.convertToSeconds(this.currentTime(), this.state.endTime) });
-    // }, 1000);
-  }
-
-  componentWillMount() {
-    this.props.addInputs(this.state);
   }
 
   update(field) {
@@ -44,11 +36,17 @@ class Timer extends React.Component {
 
   }
 
-  isValidInputs() {
-    if(this.state.startTime > this.state.endTime) {
+  isValidTime(start, end) {
+    start
+  }
+
+  isValidInputs(start, end) {
+    let pattern = /^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/;
+    if(start > end) {
+      return false;
+    } else if (!pattern.test(start) || !pattern.test(end)) {
       return false;
     }
-
     return true;
   }
 
@@ -59,7 +57,7 @@ class Timer extends React.Component {
     let minute = (time.getMinutes() > 9)? time.getMinutes().toString() : "0" + time.getMinutes().toString()
     let second = (time.getSeconds() > 9)? time.getSeconds().toString() : "0" + time.getSeconds().toString()
 
-    return hour + ':' + minute + ':' + second
+    return hour + ':' + minute + ':' + second;
   }
 
   convertToSeconds(start, end) {
@@ -74,10 +72,10 @@ class Timer extends React.Component {
   }
 
   handleSubmit() {
-    if (!this.isValidInputs()) {
-      this.setState({error: "Invalid Inputs"});
-    } else {
+    if (this.isValidInputs(this.state.startTime, this.state.endTime)) {
       this.setState({error: ""});
+    } else {
+      this.setState({error: "Invalid Inputs"});
     }
     this.props.addInputs(this.state);
     let trig = this.state.trig ? !this.state.trig : !this.state.trig;
