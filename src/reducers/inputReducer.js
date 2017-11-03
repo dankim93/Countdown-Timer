@@ -15,6 +15,7 @@ export default function(state = INITIAL_STATE, action) {
       return {...state,
         startTime: action.data.startTime,
         endTime: action.data.endTime,
+        error: action.data.error
       };
     default:
       return state;

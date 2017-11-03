@@ -8,10 +8,10 @@ class Timer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // currentTime: new Date().toLocaleTimeString(),
       startTime: "",
       endTime: "",
-      error: ""
+      error: "",
+      trig: true
     };
     this.update = this.update.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -19,10 +19,25 @@ class Timer extends React.Component {
 
   componentDidMount() {
     this.props.addInputs(this.state);
+
+    setInterval(() => {
+      if (this.props.startTime >= this.currentTime()){ //show seconds until start
+        this.setState({seconds: this.convertToSeconds(this.currentTime(), this.props.startTime) });
+      } else {
+        this.setState({seconds: this.convertToSeconds(this.currentTime(), this.props.endTime) });
+      }
+    }, 1000);
+
+    // setInterval(() => {
+    //   this.setState({seconds: this.convertToSeconds(this.currentTime(), this.state.endTime) });
+    // }, 1000);
+  }
+
+  componentWillMount() {
+    this.props.addInputs(this.state);
   }
 
   update(field) {
-    console.log(this.state);
     return e => this.setState({
       [field]: e.currentTarget.value
     });
@@ -32,21 +47,30 @@ class Timer extends React.Component {
   isValidInputs() {
     if(this.state.startTime > this.state.endTime) {
       return false;
-    } else if(this.state.startTime > new Date().toLocaleTimeString()) {
-      return false;
     }
 
     return true;
   }
 
-  convertToSeconds() {
-    // let endSeconds = parseInt(this.props.endTime[6] + this.props.endTime[7]);
-    // endSeconds += (this.props.endTime[0] + this.props.endTime[1]) * 3600;
-    // endSeconds += (this.props.endTime[3] + this.props.endTime[4]) * 60;
-    // let startSeconds = parseInt(this.props.startTime[6] + this.props.startTime[7]);
-    // startSeconds += (this.props.startTime[0] + this.props.startTime[1]) * 3600;
-    // startSeconds += (this.props.startTime[3] + this.props.startTime[4]) * 60;
-    // return endSeconds - startSeconds;
+
+  currentTime() {
+    let time = new Date();
+    let hour = (time.getHours() > 9)? time.getHours().toString() : "0" + time.getHours().toString()
+    let minute = (time.getMinutes() > 9)? time.getMinutes().toString() : "0" + time.getMinutes().toString()
+    let second = (time.getSeconds() > 9)? time.getSeconds().toString() : "0" + time.getSeconds().toString()
+
+    return hour + ':' + minute + ':' + second
+  }
+
+  convertToSeconds(start, end) {
+    let endSeconds = parseInt(end[6] + end[7]);
+    endSeconds += (end[0] + end[1]) * 3600;
+    endSeconds += (end[3] + end[4]) * 60;
+    let startSeconds = parseInt(start[6] + start[7]);
+    startSeconds += (start[0] + start[1]) * 3600;
+    startSeconds += (start[3] + start[4]) * 60;
+    console.log('seconds',endSeconds - startSeconds);
+    return endSeconds - startSeconds;
   }
 
   handleSubmit() {
@@ -55,22 +79,28 @@ class Timer extends React.Component {
     } else {
       this.setState({error: ""});
     }
-    // console.log('state:', this.state);
     this.props.addInputs(this.state);
+    let trig = this.state.trig ? !this.state.trig : !this.state.trig;
+    this.setState({trig});
   }
 
   render() {
-    // console.log(this.convertToSeconds());
-    // console.log(this.props);
-    let output;
-    if (this.props.error != "") {
-      output = this.props.error;
-    } else if(this.props.isActivate){
-      output = this.convertToSeconds();
-    } else {
-      output = "Waiting for start time";
+    let output = "";
+    let header = "";
+    if (this.props.startTime !== "") {
+      if (this.props.error !== "") {
+        header = "Status: Error";
+        output = this.props.error;
+      } else if (this.currentTime() < this.props.startTime){
+        header = "Status: Waiting until count starts"
+        output = this.state.seconds;
+      } else {
+        header = "Status: Countdown started"
+        output = this.state.seconds;
+      }
+
     }
-    console.log('output', output);
+
     return(
       <div>
           <input type="text"
@@ -86,6 +116,7 @@ class Timer extends React.Component {
           <button onClick={this.handleSubmit}>Start Countdown</button>
         <div className='output'>
           <span>Countdown</span>
+          <p>{header}</p>
           <p>{output}</p>
         </div>
       </div>
@@ -95,9 +126,9 @@ class Timer extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    startTime: state.startTime,
-    endTime: state.endTime,
-    error: state.error
+    startTime: state.input.startTime,
+    endTime: state.input.endTime,
+    error: state.input.error
   }
 };
 
@@ -105,4 +136,4 @@ const mapDispatchToProps = dispatch => {
   return bindActionCreators({...actions}, dispatch);
 };
 
-export default connect(mapStateToProps,mapDispatchToProps)(Timer);
+export default connect(mapStateToProps, mapDispatchToProps)(Timer);
