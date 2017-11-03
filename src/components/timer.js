@@ -22,9 +22,13 @@ class Timer extends React.Component {
 
     setInterval(() => {
       if (this.props.startTime >= this.currentTime()){ //show seconds until start
-        this.setState({seconds: this.convertToSeconds(this.currentTime(), this.props.startTime) });
-      } else {
-        this.setState({seconds: this.convertToSeconds(this.currentTime(), this.props.endTime) });
+        if (this.isValidInputs(this.currentTime(), this.props.startTime)) {
+          this.setState({seconds: this.convertToSeconds(this.currentTime(), this.props.startTime) });
+        }
+      } else { //show seconds until end
+        if (this.isValidInputs(this.currentTime(), this.props.endTime)) {
+          this.setState({seconds: this.convertToSeconds(this.currentTime(), this.props.endTime) });
+        }
       }
     }, 1000);
   }
@@ -33,11 +37,6 @@ class Timer extends React.Component {
     return e => this.setState({
       [field]: e.currentTarget.value
     });
-
-  }
-
-  isValidTime(start, end) {
-    start
   }
 
   isValidInputs(start, end) {
@@ -61,6 +60,8 @@ class Timer extends React.Component {
   }
 
   convertToSeconds(start, end) {
+    console.log('start',start);
+    console.log('end',end);
     let endSeconds = parseInt(end[6] + end[7]);
     endSeconds += (end[0] + end[1]) * 3600;
     endSeconds += (end[3] + end[4]) * 60;
@@ -86,9 +87,9 @@ class Timer extends React.Component {
     let output = "";
     let header = "";
     if (this.props.startTime !== "") {
-      if (this.props.error !== "") {
+      if (this.state.error !== "") {
         header = "Status: Error";
-        output = this.props.error;
+        output = this.state.error;
       } else if (this.currentTime() < this.props.startTime){
         header = "Status: Waiting until count starts"
         output = this.state.seconds;
@@ -101,6 +102,8 @@ class Timer extends React.Component {
 
     return(
       <div>
+        <span>Countdown</span>
+        <br/>
           <input type="text"
                   value={this.state.startTime}
                   onChange={this.update("startTime")}
@@ -111,9 +114,8 @@ class Timer extends React.Component {
                   onChange={this.update("endTime")}
                   className="input"
                   placeholder="hh:mm:ss"/>
-          <button onClick={this.handleSubmit}>Start Countdown</button>
+          <button onClick={this.handleSubmit} className="big-button">Start Countdown</button>
         <div className='output'>
-          <span>Countdown</span>
           <p>{header}</p>
           <p>{output}</p>
         </div>
