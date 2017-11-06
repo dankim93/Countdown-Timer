@@ -10,8 +10,7 @@ class Timer extends React.Component {
     this.state = {
       startTime: "",
       endTime: "",
-      error: "",
-      trig: true
+      error: ""
     };
     this.update = this.update.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -41,7 +40,7 @@ class Timer extends React.Component {
 
   isValidInputs(start, end) {
     let pattern = /^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/;
-    if(start > end) {
+    if(start > end || end < this.currentTime()) {
       return false;
     } else if (!pattern.test(start) || !pattern.test(end)) {
       return false;
@@ -79,8 +78,6 @@ class Timer extends React.Component {
       this.setState({error: "Invalid Inputs"});
     }
     this.props.addInputs(this.state);
-    let trig = this.state.trig ? !this.state.trig : !this.state.trig;
-    this.setState({trig});
   }
 
   render() {
@@ -127,8 +124,7 @@ class Timer extends React.Component {
 const mapStateToProps = (state) => {
   return {
     startTime: state.input.startTime,
-    endTime: state.input.endTime,
-    error: state.input.error
+    endTime: state.input.endTime
   }
 };
 
