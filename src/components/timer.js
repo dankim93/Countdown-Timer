@@ -13,7 +13,7 @@ class Timer extends React.Component {
       error: ""
     };
     this.update = this.update.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    // this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
@@ -71,7 +71,8 @@ class Timer extends React.Component {
     return endSeconds - startSeconds;
   }
 
-  handleSubmit() {
+  handleSubmit(event) {
+    event.preventDefault()
     if (this.isValidInputs(this.state.startTime, this.state.endTime)) {
       this.setState({error: ""});
     } else {
@@ -101,6 +102,8 @@ class Timer extends React.Component {
       <div>
         <span>Countdown</span>
         <br/>
+
+        <form onSubmit={(e) => this.handleSubmit(e)}>
           <input type="text"
                   value={this.state.startTime}
                   onChange={this.update("startTime")}
@@ -111,7 +114,10 @@ class Timer extends React.Component {
                   onChange={this.update("endTime")}
                   className="input"
                   placeholder="hh:mm:ss"/>
-          <button onClick={this.handleSubmit} className="big-button">Start Countdown</button>
+          <button type="submit" className="big-button">Start Countdown</button>
+        </form>
+
+
         <div className='output'>
           <p>{header}</p>
           <p>{output}</p>
