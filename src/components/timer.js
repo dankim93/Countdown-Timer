@@ -13,7 +13,7 @@ class Timer extends React.Component {
       error: ""
     };
     this.update = this.update.bind(this);
-    // this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
@@ -103,7 +103,7 @@ class Timer extends React.Component {
         <span>Countdown</span>
         <br/>
 
-        <form onSubmit={(e) => this.handleSubmit(e)}>
+        <form onSubmit={this.handleSubmit}>
           <input type="text"
                   value={this.state.startTime}
                   onChange={this.update("startTime")}
